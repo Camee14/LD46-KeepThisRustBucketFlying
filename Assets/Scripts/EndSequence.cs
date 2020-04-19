@@ -8,6 +8,14 @@ public class EndSequence : IGameStage
 {
     private Transform m_sean;
     private Transform m_ship;
+
+    private Transform[] m_debris;
+    private Vector3[] m_debrisVel = {
+        new Vector3(1.2f, 0f, -0.1f),
+        new Vector3(0.9f, 0f, -0.3f),
+        new Vector3(0.8f, 0f,  0.1f),
+        new Vector3(1.25f, 0f, 0.04f)
+    };
     
     private Vector3 m_seanVel = new Vector3(1f, 0f, 0.35f);
     private Vector3 m_shipVel = new Vector3(-1.2f, 0f, 0f);
@@ -36,6 +44,8 @@ public class EndSequence : IGameStage
     {
         m_sean = GameObject.FindGameObjectWithTag("Player").transform;
         m_ship = GameObject.Find("Ship").transform;
+
+        m_debris = System.Array.ConvertAll(GameObject.FindGameObjectsWithTag("Debris"), input => input.transform);
         
         m_uiContainer = GameObject.Find("RestartUI").transform.GetChild(0);
         m_restart = m_uiContainer.GetComponentInChildren<Button>();
@@ -108,6 +118,12 @@ public class EndSequence : IGameStage
     
         m_sean.transform.position += m_seanVel * Time.deltaTime;
         m_sean.transform.rotation *= Quaternion.AngleAxis(30f * Time.deltaTime, Vector3.forward);
+
+        for (int i = 0; i < m_debris.Length; i++)
+        {
+            m_debris[i].position += m_debrisVel[i] * Time.deltaTime;
+            m_debris[i].rotation *= Quaternion.AngleAxis(30f * Time.deltaTime, Vector3.forward);
+        }
     }
 
     public void Dismiss()
