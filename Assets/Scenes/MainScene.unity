@@ -3125,16 +3125,36 @@ PrefabInstance:
       propertyPath: m_alarmAudio
       value: 
       objectReference: {fileID: 1278901036}
+    - target: {fileID: 6398368342538448030, guid: d0267c75da35ec34b9b37fc0d8044ef4,
+        type: 3}
+      propertyPath: m_decayIncreaseRate
+      value: 0.025
+      objectReference: {fileID: 0}
     - target: {fileID: 6398368343310655150, guid: d0267c75da35ec34b9b37fc0d8044ef4,
+        type: 3}
+      propertyPath: m_alarmAudio
+      value: 
+      objectReference: {fileID: 1278901036}
+    - target: {fileID: 6398368343310655150, guid: d0267c75da35ec34b9b37fc0d8044ef4,
+        type: 3}
+      propertyPath: m_decayIncreaseRate
+      value: 0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 6398368343310655150, guid: d0267c75da35ec34b9b37fc0d8044ef4,
+        type: 3}
+      propertyPath: m_startingDecayRate
+      value: 1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7098137705618161745, guid: d0267c75da35ec34b9b37fc0d8044ef4,
         type: 3}
       propertyPath: m_alarmAudio
       value: 
       objectReference: {fileID: 1278901036}
     - target: {fileID: 7098137705618161745, guid: d0267c75da35ec34b9b37fc0d8044ef4,
         type: 3}
-      propertyPath: m_alarmAudio
-      value: 
-      objectReference: {fileID: 1278901036}
+      propertyPath: m_decayIncreaseRate
+      value: 0.01
+      objectReference: {fileID: 0}
     - target: {fileID: 8692161050138875883, guid: d0267c75da35ec34b9b37fc0d8044ef4,
         type: 3}
       propertyPath: m_ui
