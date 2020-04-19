@@ -41,8 +41,10 @@ public class Game : IGameStage
     public void Setup()
     {
         m_sean.Transform.position = Vector3.zero;
-        m_sean.SetTargetPos(Vector3.zero);
+        m_sean.Transform.rotation = Quaternion.identity;
         
+        m_sean.SetTargetPos(Vector3.zero);
+
         GameObject.Find("Ship").transform.position = Vector3.zero;
 
         Camera.main.transform.position = new Vector3(0, 0, -5f);
@@ -52,7 +54,11 @@ public class Game : IGameStage
             system.Setup();
         }
         
+        m_alarm.Cancel();
         m_alarm.ResetVolume();
+        
+        m_success.Stop();
+        m_fail.Stop();
         
         m_scoreTimer = 0f;
     }
