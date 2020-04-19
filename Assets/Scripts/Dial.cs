@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class Dial : MonoBehaviour , IDragHandler
 {
     public float m_threshold = 10f;
     public bool m_isVertical = false;
+
+    public Image m_dialImage;
     
     private float m_dialSubPos = 0f;
 
@@ -21,6 +24,8 @@ public class Dial : MonoBehaviour , IDragHandler
         {
             m_dialDelta = Mathf.RoundToInt(m_dialSubPos / m_threshold);
             m_dialPos += m_dialDelta;
+            
+            m_dialImage.transform.rotation *= Quaternion.AngleAxis(10f * m_dialDelta, Vector3.forward);
         }
         
         m_dialSubPos = m_dialSubPos % m_threshold;
