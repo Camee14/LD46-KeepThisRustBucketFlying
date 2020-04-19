@@ -20,6 +20,7 @@ public class ShipSystem : MonoBehaviour
     private SpriteRenderer m_renderer;
     private Image m_ui;
     private float m_alarmTimer;
+    
     public MiniGame MiniGame => m_miniGame;
 
     private void Awake()
@@ -29,7 +30,7 @@ public class ShipSystem : MonoBehaviour
         m_miniGame.Setup();
         m_health = m_startingHealth;
 
-        Transform ui = Instantiate(m_uiPrefab, transform.position + Vector3.forward, Camera.main.transform.rotation);
+        Transform ui = Instantiate(m_uiPrefab, transform.position + Vector3.up, Camera.main.transform.rotation);
         ui.SetParent(transform);
         ui.GetComponent<Canvas>().worldCamera = Camera.main;
 
@@ -52,6 +53,11 @@ public class ShipSystem : MonoBehaviour
         return m_health <= 0;
     }
 
+    public bool AlarmActive()
+    {
+        return m_health / m_startingHealth <= 0.33f;
+    }
+
     public void Replenish()
     {
         m_health = m_startingHealth;
@@ -66,7 +72,7 @@ public class ShipSystem : MonoBehaviour
     {
         Bounds bounds = m_renderer.bounds;
         return bounds.min.x < worldPos.x && bounds.max.x > worldPos.x
-            && bounds.min.z < worldPos.z && bounds.max.z > worldPos.z;
+            && bounds.min.y < worldPos.y && bounds.max.y > worldPos.y;
     }
 
     private void SetUI()
@@ -84,6 +90,7 @@ public class ShipSystem : MonoBehaviour
         }
         else
         {
+            m_ui.color = Color.blue;
             m_ui.transform.localScale = Vector3.one;
             m_alarmTimer = 0f;
         }

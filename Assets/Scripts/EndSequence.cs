@@ -11,13 +11,13 @@ public class EndSequence : IGameStage
 
     private Transform[] m_debris;
     private Vector3[] m_debrisVel = {
-        new Vector3(1.2f, 0f, -0.1f),
-        new Vector3(0.9f, 0f, -0.3f),
-        new Vector3(0.8f, 0f,  0.1f),
-        new Vector3(1.25f, 0f, 0.04f)
+        new Vector3(1.2f, -0.1f, 0f),
+        new Vector3(0.9f, -0.3f, 0f),
+        new Vector3(0.8f,  0.1f, 0f),
+        new Vector3(1.25f, 0.04f, 0f)
     };
     
-    private Vector3 m_seanVel = new Vector3(1f, 0f, 0.35f);
+    private Vector3 m_seanVel = new Vector3(1f, 0.35f, 0f);
     private Vector3 m_shipVel = new Vector3(-1.2f, 0f, 0f);
 
     private enum SequenceStage
@@ -40,6 +40,10 @@ public class EndSequence : IGameStage
     private bool m_restartClicked = false;
 
     private float m_finalScore;
+    
+    private Alarm m_alarm;
+    private AudioSource m_explosion;
+    
     public EndSequence()
     {
         m_sean = GameObject.FindGameObjectWithTag("Player").transform;
@@ -52,6 +56,9 @@ public class EndSequence : IGameStage
         m_restart.onClick.AddListener(() => m_restartClicked = true);
         m_score = m_uiContainer.Find("Score").GetComponent<TMP_Text>();
         m_score.text = "";
+        
+        m_alarm = GameObject.Find("Alarm").GetComponent<Alarm>();
+        m_explosion = GameObject.Find("ShipExplosionAudio").GetComponent<AudioSource>();
     }
 
     public void SetFinalScore(float finalScore)
@@ -63,6 +70,11 @@ public class EndSequence : IGameStage
     {
         m_activeStage = SequenceStage.SHIP_WITHDRAW;
         m_stageTimer = 0f;
+        
+        m_debris[0].position = new Vector3(-10.66f, 0f, 0f);
+        m_debris[1].position = new Vector3(-11.58f, -1.05f,0f);
+        m_debris[2].position = new Vector3(-11.69f, 0.73f, 0f);
+        m_debris[3].position = new Vector3(-11.45f, -2.77f, 0f);
         
         m_restartClicked = false;
     }
@@ -95,6 +107,8 @@ public class EndSequence : IGameStage
         
         m_sean.transform.position += m_shipVel * Time.deltaTime;
         m_ship.transform.position += m_shipVel * Time.deltaTime;
+        
+        m_alarm.ReduceVolume(0.15f * Time.deltaTime);
     }
 
     private void UpdateBlackScreen()
@@ -105,6 +119,7 @@ public class EndSequence : IGameStage
             m_stageTimer = 0f;
             
             m_sean.transform.position = new Vector3(-8, 0, 0);
+            m_explosion.Play();
         }
     }
 
@@ -128,6 +143,11 @@ public class EndSequence : IGameStage
 
     public void Dismiss()
     {
+        m_debris[0].position = new Vector3(-10.66f, 0f, 0f);
+        m_debris[1].position = new Vector3(-11.58f, 0f, -1.05f);
+        m_debris[2].position = new Vector3(-11.69f, 0f, 0.73f);
+        m_debris[3].position = new Vector3(-11.45f, 0f, -2.77f);
+        
         m_uiContainer.gameObject.SetActive(false);
     }
 }

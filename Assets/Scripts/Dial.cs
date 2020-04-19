@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -15,7 +16,14 @@ public class Dial : MonoBehaviour , IDragHandler
 
     private int m_dialDelta = 0;
     private int m_dialPos = 0;
-    
+
+    private AudioSource m_click;
+
+    private void Awake()
+    {
+        m_click = GetComponent<AudioSource>();
+    }
+
     public void OnDrag(PointerEventData eventData)
     {
         m_dialSubPos += m_isVertical ? eventData.delta.y : eventData.delta.x;
@@ -24,6 +32,9 @@ public class Dial : MonoBehaviour , IDragHandler
         {
             m_dialDelta = Mathf.RoundToInt(m_dialSubPos / m_threshold);
             m_dialPos += m_dialDelta;
+            
+            if(!m_click.isPlaying)
+                m_click.Play();
             
             m_dialImage.transform.rotation *= Quaternion.AngleAxis(10f * m_dialDelta, Vector3.forward);
         }

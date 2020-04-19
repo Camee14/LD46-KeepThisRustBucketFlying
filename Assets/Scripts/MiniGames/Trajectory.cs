@@ -13,6 +13,8 @@ public class Trajectory : MiniGame
     private RectTransform m_verticalPointer;
     private Button m_lockButton;
 
+    private AudioSource m_pingPongAudio;
+
     private Vector3 m_min;
     private Vector3 m_max;
     private float m_pingPong;
@@ -27,6 +29,8 @@ public class Trajectory : MiniGame
         m_horizontalPointer = container.Find("HorizontalPointer").GetComponent<RectTransform>();
         m_verticalPointer = container.Find("VerticalPointer").GetComponent<RectTransform>();
         m_lockButton = container.Find("Lock").GetComponent<Button>();
+
+        m_pingPongAudio = container.Find("PingPongAudio").GetComponent<AudioSource>();
         
         Rect rect = m_ui.GetComponent<RectTransform>().rect;
         m_min = rect.min;
@@ -58,34 +62,25 @@ public class Trajectory : MiniGame
     {
         if (m_lock)
         {
-            float targetMin;
-            float targetMax;
-            float pointer;
             if (m_movingVerticalPointer)
             {
-                targetMin = m_target.localPosition.y + m_target.rect.yMin * m_targetSize;
-                targetMax = m_target.localPosition.y + m_target.rect.yMax * m_targetSize;
-                pointer = m_verticalPointer.transform.localPosition.y;
-                
-                if (targetMin <= pointer && targetMax >= pointer)
+                if (IsVerticalPointerOverTarget())
                 {
                     return MiniGameState.SUCESS;
                 }
                 return MiniGameState.FAILED;
             }
 
-            targetMin = m_target.localPosition.x + m_target.rect.xMin * m_targetSize;
-            targetMax = m_target.localPosition.x + m_target.rect.xMax * m_targetSize;
-            pointer = m_horizontalPointer.transform.localPosition.x;
-            
-            if (targetMin > pointer || targetMax < pointer)
+            if (IsHorizontalPointerOverTarget())
+            {
+                m_pingPong = 0f;
+                m_movingVerticalPointer = true;
+                m_verticalPointer.gameObject.SetActive(true);
+            }
+            else
             {
                 return MiniGameState.FAILED;
             }
-            
-            m_pingPong = 0f;
-            m_movingVerticalPointer = true;
-            m_verticalPointer.gameObject.SetActive(true);
         }
         m_lock = false;
         
@@ -94,10 +89,20 @@ public class Trajectory : MiniGame
         
         if (m_movingVerticalPointer)
         {
+            if (IsVerticalPointerOverTarget(0.5f) && !m_pingPongAudio.isPlaying)
+            {
+                m_pingPongAudio.Play();
+            }
+
             SetVerticalPos(per);
         }
         else
         {
+            if (IsHorizontalPointerOverTarget(0.5f) && !m_pingPongAudio.isPlaying)
+            {
+                m_pingPongAudio.Play();
+            }
+            
             SetHorizontalPos(per);
         }
 
@@ -116,6 +121,24 @@ public class Trajectory : MiniGame
         Vector3 vPos = Vector3.zero;
         vPos.y = Mathf.Lerp(m_min.y, m_max.y, per);
         m_verticalPointer.localPosition = vPos;
+    }
+
+    private bool IsHorizontalPointerOverTarget(float tolerance = 1f)
+    {
+        float targetMin = m_target.localPosition.x + m_target.rect.xMin * m_targetSize * tolerance;
+        float targetMax = m_target.localPosition.x + m_target.rect.xMax * m_targetSize * tolerance;
+        float pointer = m_horizontalPointer.transform.localPosition.x;
+
+        return targetMin <= pointer && targetMax >= pointer;
+    }
+
+    private bool IsVerticalPointerOverTarget(float tolerance = 1f)
+    {
+        float targetMin = m_target.localPosition.y + m_target.rect.yMin * m_targetSize * tolerance;
+        float targetMax = m_target.localPosition.y + m_target.rect.yMax * m_targetSize * tolerance;
+        float pointer = m_verticalPointer.transform.localPosition.y;
+
+        return targetMin <= pointer && targetMax >= pointer;
     }
 
     public override void Dismiss()

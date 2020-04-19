@@ -28,7 +28,7 @@ public class Sean
         float vel = Vector3.Magnitude(nextPos - m_transform.position);
         m_transform.position = nextPos;
         
-        WalkAnim(vel);
+        //WalkAnim(vel);
     }
 
     private void WalkAnim(float vel)

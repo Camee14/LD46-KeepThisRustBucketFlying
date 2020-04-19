@@ -10,6 +10,11 @@ public class Game : IGameStage
     private Sean m_sean;
     private ShipSystem[] m_shipSystems;
     private int m_currentMiniGame;
+    private InteriorDebris[] m_InteriorDebris;
+    
+    private Alarm m_alarm;
+    private AudioSource m_success;
+    private AudioSource m_fail;
 
     private EndSequence m_endSequence;
     private float m_scoreTimer;
@@ -24,6 +29,12 @@ public class Game : IGameStage
         m_shipSystems = GameObject.FindObjectsOfType<ShipSystem>();
         m_currentMiniGame = -1;
 
+        m_InteriorDebris = GameObject.FindObjectsOfType<InteriorDebris>();
+
+        m_alarm = GameObject.Find("Alarm").GetComponent<Alarm>();
+        m_success = GameObject.Find("SuccessAudio").GetComponent<AudioSource>();
+        m_fail = GameObject.Find("FailAudio").GetComponent<AudioSource>();
+        
         m_endSequence = endSequence;
     }
 
@@ -34,13 +45,15 @@ public class Game : IGameStage
         
         GameObject.Find("Ship").transform.position = Vector3.zero;
 
-        Camera.main.transform.position = new Vector3(0, 5f, 0);
+        Camera.main.transform.position = new Vector3(0, 0, -5f);
 
         foreach (ShipSystem system in m_shipSystems)
         {
             system.Setup();
         }
-
+        
+        m_alarm.ResetVolume();
+        
         m_scoreTimer = 0f;
     }
 
@@ -60,11 +73,13 @@ public class Game : IGameStage
                 case MiniGame.MiniGameState.SUCESS: 
                     system.Replenish();
                     system.MiniGame.Dismiss();
+                    m_success.Play();
                     m_currentMiniGame = -1;
                     break;
                 case MiniGame.MiniGameState.FAILED:
                     system.ApplyDamage();
                     system.MiniGame.Dismiss();
+                    m_fail.Play();
                     m_currentMiniGame = -1;
                     break;
                 default: Debug.LogError("MiniGame in unexpected state"); break;
@@ -79,7 +94,8 @@ public class Game : IGameStage
                 checkSystemsForInput = true;
             }
         }
-        
+
+        bool shipAlarmActive = false;
         for(int i = 0; i < m_shipSystems.Length; i++)
         {
             ShipSystem system = m_shipSystems[i];
@@ -94,10 +110,29 @@ public class Game : IGameStage
             {
                 return false;
             }
+
+            if (system.AlarmActive())
+            {
+                shipAlarmActive = true;
+            }
         }
-        
+
+        if (shipAlarmActive)
+        {
+            m_alarm.Play();
+        }
+        else
+        {
+            m_alarm.Cancel();
+        }
+
         m_sean.UpdatePos();
         m_scoreTimer += Time.deltaTime;
+
+        foreach (InteriorDebris debris in m_InteriorDebris)
+        {
+            debris.UpdatePos();
+        }
 
         return true;
     }
