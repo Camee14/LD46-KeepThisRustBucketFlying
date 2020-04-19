@@ -8,11 +8,14 @@ public class Sean
     private Vector3 m_targetPos;
     
     private float m_walkAnimTimer;
+
+    public Transform Transform => m_transform;
+    
     public Sean()
     {
         m_transform = GameObject.FindGameObjectWithTag("Player").transform;
     }
-
+    
     public void SetTargetPos(Vector3 pos)
     {
         m_targetPos = pos;

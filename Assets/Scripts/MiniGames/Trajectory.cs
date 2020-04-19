@@ -22,10 +22,11 @@ public class Trajectory : MiniGame
     
     public override void Setup()
     {
-        m_target = m_ui.transform.Find("Target").GetComponent<RectTransform>();
-        m_horizontalPointer = m_ui.transform.Find("HorizontalPointer").GetComponent<RectTransform>();
-        m_verticalPointer = m_ui.transform.Find("VerticalPointer").GetComponent<RectTransform>();
-        m_lockButton = m_ui.transform.Find("Lock").GetComponent<Button>();
+        Transform container = m_ui.transform.GetChild(0);
+        m_target = container.Find("Target").GetComponent<RectTransform>();
+        m_horizontalPointer = container.Find("HorizontalPointer").GetComponent<RectTransform>();
+        m_verticalPointer = container.Find("VerticalPointer").GetComponent<RectTransform>();
+        m_lockButton = container.Find("Lock").GetComponent<Button>();
         
         Rect rect = m_ui.GetComponent<RectTransform>().rect;
         m_min = rect.min;
@@ -50,7 +51,7 @@ public class Trajectory : MiniGame
         m_target.localPosition = targetPos;
         
         m_verticalPointer.gameObject.SetActive(false);
-        m_ui.SetActive(true);
+        m_ui.transform.GetChild(0).gameObject.SetActive(true);
     }
 
     public override MiniGameState Play()
@@ -77,7 +78,7 @@ public class Trajectory : MiniGame
             targetMax = m_target.localPosition.x + m_target.rect.xMax * m_targetSize;
             pointer = m_horizontalPointer.transform.localPosition.x;
             
-            if (targetMin > pointer && targetMax < pointer)
+            if (targetMin > pointer || targetMax < pointer)
             {
                 return MiniGameState.FAILED;
             }
@@ -119,6 +120,6 @@ public class Trajectory : MiniGame
 
     public override void Dismiss()
     {
-        m_ui.SetActive(false);
+        m_ui.transform.GetChild(0).gameObject.SetActive(false);
     }
 }

@@ -4,29 +4,38 @@ using UnityEngine;
 
 public class Director : MonoBehaviour
 {
-    private Game m_gameInstance;
-    private EndSequence m_EndSequence;
-    
-    private bool m_gameRunning = true;
+    private IGameStage[] m_stages;
+    private int m_currentStage;
+    private IGameStage CurrentStage => m_stages[m_currentStage];
+
+    private void IncrementStageCounter()
+    {
+        m_currentStage = (m_currentStage + 1) % m_stages.Length;
+    }
+
     void Awake()
     {
-        m_gameInstance = new Game();
-        m_EndSequence = new EndSequence();
+        EndSequence endSequence = new EndSequence();
+        Game game = new Game(endSequence);
+        
+        m_stages = new IGameStage[2];
+        m_stages[0] = game;
+        m_stages[1] = endSequence;
+    }
+
+    void Start()
+    {
+        CurrentStage.Setup();
     }
 
     void Update()
     {
-        if (m_gameRunning)
+        bool result = CurrentStage.Update();
+        if (!result)
         {
-            m_gameRunning = m_gameInstance.Update();
-            if (!m_gameRunning)
-            {
-                m_EndSequence.Setup();
-            }
-        }
-        else
-        {
-            m_EndSequence.Update();
+            CurrentStage.Dismiss();
+            IncrementStageCounter();
+            CurrentStage.Setup();
         }
     }
 }

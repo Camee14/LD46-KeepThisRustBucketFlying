@@ -4,18 +4,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class Game
+public class Game : IGameStage
 {
     private CameraMove m_camMove;
     private Sean m_sean;
     private ShipSystem[] m_shipSystems;
     private int m_currentMiniGame;
 
-    private float m_decayRate = 1f;
-    private float m_decayIncreaseRate = 0.1f;
-    private float m_failDamage = 25f;
+    private EndSequence m_endSequence;
+    private float m_scoreTimer;
     
-    public Game()
+    public Game(EndSequence endSequence)
     {
         Random.InitState(DateTime.Now.Millisecond);
         m_sean = new Sean();
@@ -24,6 +23,25 @@ public class Game
 
         m_shipSystems = GameObject.FindObjectsOfType<ShipSystem>();
         m_currentMiniGame = -1;
+
+        m_endSequence = endSequence;
+    }
+
+    public void Setup()
+    {
+        m_sean.Transform.position = Vector3.zero;
+        m_sean.SetTargetPos(Vector3.zero);
+        
+        GameObject.Find("Ship").transform.position = Vector3.zero;
+
+        Camera.main.transform.position = new Vector3(0, 5f, 0);
+
+        foreach (ShipSystem system in m_shipSystems)
+        {
+            system.Setup();
+        }
+
+        m_scoreTimer = 0f;
     }
 
     public bool Update()
@@ -45,7 +63,7 @@ public class Game
                     m_currentMiniGame = -1;
                     break;
                 case MiniGame.MiniGameState.FAILED:
-                    system.ApplyDamage(m_failDamage);
+                    system.ApplyDamage();
                     system.MiniGame.Dismiss();
                     m_currentMiniGame = -1;
                     break;
@@ -72,16 +90,25 @@ public class Game
                 m_currentMiniGame = i;
             }
 
-            if(system.Decay(m_decayRate))
+            if(system.Decay())
             {
                 return false;
             }
         }
         
         m_sean.UpdatePos();
-        m_decayRate += m_decayIncreaseRate * Time.deltaTime;
+        m_scoreTimer += Time.deltaTime;
 
         return true;
     }
-    
+
+    public void Dismiss()
+    {
+        foreach (ShipSystem system in m_shipSystems)
+        {
+            system.MiniGame.Dismiss();
+        }
+        
+        m_endSequence.SetFinalScore(m_scoreTimer);
+    }
 }

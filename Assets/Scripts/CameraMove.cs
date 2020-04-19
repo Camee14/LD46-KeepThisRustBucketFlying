@@ -15,9 +15,10 @@ public class CameraMove : MonoBehaviour
 
     public void UpdateCameraPos()
     {
-        float input = Input.GetAxis("Horizontal");
-        m_cameraTargetPos.x = Mathf.Clamp(m_cameraTargetPos.x + input, m_xMin, m_xMax);
+        float mousePosX = (Input.mousePosition.x - Screen.width * 0.5f) * 0.01f;
 
+        m_cameraTargetPos.x = Mathf.Clamp(mousePosX, m_xMin, m_xMax);
+        
         transform.position = Vector3.Lerp(transform.position, m_cameraTargetPos, Time.deltaTime);
     }
 }
